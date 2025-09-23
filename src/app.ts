@@ -12,9 +12,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({
-  origin: ['https://camp-frontend.vercel.app'], 
+  origin: ['http://localhost:5173'], 
   credentials: true,
 }));
+console.log("all okkkk")
+
 
 
 app.get('/', (req, res) => {

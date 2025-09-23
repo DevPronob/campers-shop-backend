@@ -4,6 +4,7 @@ import { TPayment } from './paymentWithUserData.interface';
 import { Payment } from './paymentWithUserData.model';
 import AppError from '../../errors/AppError';
 import { Cart } from '../cart/cart.model';
+import mongoose from 'mongoose';
 
 const stripe = new Stripe(config.stripe as string);
 
@@ -39,19 +40,30 @@ const setPayment = async (payload: PaymentPayload): Promise<PaymentResponse> => 
 
 
 const setUserPayment = async (payload: TPayment) => {
- const result = await Payment.create(payload);
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  if (payload.userId) {
-    await Cart.deleteMany({ userId: payload.userId });
-    console.log(`Cart deleted for user: ${payload.userId}`);
+  try {
+    const result = await Payment.create([payload], { session });
+
+    await Cart.deleteMany({ userId: payload.userId }).session(session);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    console.log(`Payment created & cart deleted for user: ${payload.userId}`);
+
+    return result[0]; 
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
-
-  return result;
 };
 
 const getPaymentById = async (id: string) => {
   console.log(id)
-    const payment = await Payment.findOne({userId:id});
+    const payment = await Payment.find({userId:id});
     console.log(payment)
     if (!payment) {
         throw new AppError(404, "Payment not found");

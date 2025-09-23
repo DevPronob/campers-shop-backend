@@ -49,7 +49,7 @@ const setUserPayment = (payload) => __awaiter(void 0, void 0, void 0, function* 
 });
 const getPaymentById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(id);
-    const payment = yield paymentWithUserData_model_1.Payment.findOne({ userId: id });
+    const payment = yield paymentWithUserData_model_1.Payment.find({ userId: id });
     console.log(payment);
     if (!payment) {
         throw new AppError_1.default(404, "Payment not found");
