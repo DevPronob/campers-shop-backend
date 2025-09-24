@@ -38,6 +38,14 @@ Use the following credentials to log in as an admin:
 - **Email:** admin@admin.com  
 - **Password:** admin
 
+
+---
+## Deployment Links
+
+**Frontend:** https://campers-ecom-frontend.vercel.app/
+**Backend:** https://campers-ecom-backend.vercel.app/
+
+
 ---
 
 ## Tech Stack

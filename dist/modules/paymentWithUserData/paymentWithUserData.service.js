@@ -18,6 +18,7 @@ const config_1 = __importDefault(require("../../config"));
 const paymentWithUserData_model_1 = require("./paymentWithUserData.model");
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const cart_model_1 = require("../cart/cart.model");
+const mongoose_1 = __importDefault(require("mongoose"));
 const stripe = new stripe_1.default(config_1.default.stripe);
 const setPayment = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { price } = payload;
@@ -40,12 +41,21 @@ const setPayment = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 const setUserPayment = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield paymentWithUserData_model_1.Payment.create(payload);
-    if (payload.userId) {
-        yield cart_model_1.Cart.deleteMany({ userId: payload.userId });
-        console.log(`Cart deleted for user: ${payload.userId}`);
+    const session = yield mongoose_1.default.startSession();
+    session.startTransaction();
+    try {
+        const result = yield paymentWithUserData_model_1.Payment.create([payload], { session });
+        yield cart_model_1.Cart.deleteMany({ userId: payload.userId }).session(session);
+        yield session.commitTransaction();
+        session.endSession();
+        console.log(`Payment created & cart deleted for user: ${payload.userId}`);
+        return result[0];
     }
-    return result;
+    catch (error) {
+        yield session.abortTransaction();
+        session.endSession();
+        throw error;
+    }
 });
 const getPaymentById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(id);
