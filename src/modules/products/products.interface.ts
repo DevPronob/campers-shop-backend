@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 export type TProduct = {
     name: string;
     price: number;
-    category: Types.ObjectId|null;
+    category: string|null;
     description: string;
     imageUrls: string[];
     stock: number;

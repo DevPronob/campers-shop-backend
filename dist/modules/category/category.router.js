@@ -11,6 +11,6 @@ const user_constant_1 = require("../user/user.constant");
 const router = express_1.default.Router();
 router.post('/', (0, auth_1.auth)(user_constant_1.USER_ROLE.ADMIN), category_controller_1.categoryController.createCategory);
 router.get('/', (0, auth_1.auth)(user_constant_1.USER_ROLE.ADMIN, user_constant_1.USER_ROLE.USER), category_controller_1.categoryController.getCategory);
-router.get('/:id', category_controller_1.categoryController.getSingleCategory);
+router.get('/:id', (0, auth_1.auth)(user_constant_1.USER_ROLE.ADMIN, user_constant_1.USER_ROLE.USER), category_controller_1.categoryController.getSingleCategory);
 // router.get('/:id', productController.getSingleProduct)
 exports.categoryRoute = router;

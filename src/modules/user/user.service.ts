@@ -6,9 +6,9 @@ import { User } from "./user.model";
 
 export const registerUser = async(user: IUser) => {
     const isUserExist =await User.findOne({ email: user.email });
-    // if (isUserExist) {
-    //     throw new AppError(500,"User already exist");
-    // }
+    if (isUserExist) {
+        throw new AppError(500,"User already exist");
+    }
     const result = await User.create(user);
     const userData = {
         name: user.name,

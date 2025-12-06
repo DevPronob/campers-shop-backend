@@ -14,13 +14,14 @@ export const generateToken = (payload: TokenPayload, secret: string): string => 
 export const verifyToken = (
   token: string,
   secret: string,
-): JwtPayload & TokenPayload | null => {
+) => {
   try {
+    console.log(token,"token in verify", secret)
     const decoded = jwt.verify(token, secret);
     if (typeof decoded === 'string') {
       return null; // in case it's a string instead of an object
     }
-    return decoded as JwtPayload & TokenPayload;
+    return decoded;
   } catch (error) {
     console.error('Token verification failed:', error);
     return null;

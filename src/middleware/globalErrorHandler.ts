@@ -5,9 +5,10 @@ import handleZodError from "../errors/handleZodError";
 import handleCastError from "../errors/handleCastError";
 import AppError from "../errors/AppError";
 import { ZodError } from "zod";
+import config from "../config";
 // import config from "../config"; // uncomment if you need NODE_ENV
 
-const globalErrorHandler: ErrorRequestHandler = (
+const globalErrorHandler: ErrorRequestHandler = async(
   err: any,
   req: Request,
   res: Response,
@@ -25,34 +26,34 @@ const globalErrorHandler: ErrorRequestHandler = (
 
   // 🔹 Handle Mongoose duplicate key error
   if (err?.code === 11000) {
-    const simplifiedError = handleDuplicateError(err);
+    const simplifiedError = await handleDuplicateError(err);
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
     errorSources = simplifiedError.errorSources;
   }
   // 🔹 Handle Mongoose validation error
   else if (err?.name === "ValidationError") {
-    const simplifiedError = handleValidationError(err);
+    const simplifiedError = await handleValidationError(err);
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
     errorSources = simplifiedError.errorSources;
   }
   // 🔹 Handle Zod validation error
   else if (err instanceof ZodError) {
-    const simplifiedError = handleZodError(err);
+    const simplifiedError =await handleZodError(err);
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
     errorSources = simplifiedError.errorSources;
   }
   // 🔹 Handle Mongoose cast error (invalid ObjectId, etc.)
   else if (err?.name === "CastError") {
-    const simplifiedError = handleCastError(err);
+    const simplifiedError =await handleCastError(err);
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
     errorSources = simplifiedError.errorSources;
   }
   // 🔹 Handle custom AppError
-  else if (err instanceof AppError) {
+  else if (await err instanceof AppError) {
     statusCode = err.statusCode;
     message = err.message;
     errorSources = [
@@ -68,7 +69,7 @@ const globalErrorHandler: ErrorRequestHandler = (
     success: false,
     message,
     errorSources,
-    // stack: config.NODE_ENV === "development" ? err.stack : null,
+    stack: config.node_env === "development" ? err.stack : null,
   });
 };
 

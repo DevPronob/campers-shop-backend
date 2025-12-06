@@ -11,6 +11,7 @@ const generateToken = (payload, secret) => {
 exports.generateToken = generateToken;
 const verifyToken = (token, secret) => {
     try {
+        console.log(token, "token in verify", secret);
         const decoded = jsonwebtoken_1.default.verify(token, secret);
         if (typeof decoded === 'string') {
             return null; // in case it's a string instead of an object

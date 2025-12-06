@@ -18,9 +18,9 @@ const token_1 = require("../../utilitis/token");
 const user_model_1 = require("./user.model");
 const registerUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
     const isUserExist = yield user_model_1.User.findOne({ email: user.email });
-    // if (isUserExist) {
-    //     throw new AppError(500,"User already exist");
-    // }
+    if (isUserExist) {
+        throw new AppError_1.default(500, "User already exist");
+    }
     const result = yield user_model_1.User.create(user);
     const userData = {
         name: user.name,

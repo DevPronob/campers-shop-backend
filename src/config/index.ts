@@ -9,6 +9,7 @@ const config = {
     mongodb_url: process.env.MONGODB_URL,
     stripe: process.env.STRIPE,
     jwt_secret: process.env.JWT_SECRET,
+    node_env: process.env.NODE_ENV,
 };
 
 export default config;

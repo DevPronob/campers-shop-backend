@@ -5,7 +5,7 @@ import { TProduct } from "./products.interface";
 const productModel = new Schema<TProduct>({
     name: { type: String, required: true },
     price: { type: Number, required: true },
-    category: { type: Schema.Types.ObjectId, ref: "Category" },
+    category: { type: String },
     description: { type: String, required: true },
     ratings: { type: Number, required: true },
     imageUrls: { type: [String] },
