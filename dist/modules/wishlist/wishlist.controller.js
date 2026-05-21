@@ -16,7 +16,8 @@ exports.WishlistController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const wishlist_service_1 = require("./wishlist.service");
 const sendResponse_1 = __importDefault(require("../../utilitis/sendResponse"));
-const createWishlistItem = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const catchAsync_1 = __importDefault(require("../../utilitis/catchAsync"));
+const createWishlistItem = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { productId } = req.body;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
@@ -27,8 +28,8 @@ const createWishlistItem = (req, res) => __awaiter(void 0, void 0, void 0, funct
         message: 'wishlist item created successfully',
         data: wishlistItem
     });
-});
-const getWishlistItems = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+}));
+const getWishlistItems = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
     const wishlistItems = yield wishlist_service_1.WishlistService.getWishlistItems(userId);
@@ -38,8 +39,8 @@ const getWishlistItems = (req, res) => __awaiter(void 0, void 0, void 0, functio
         message: 'wishlist items created successfully',
         data: wishlistItems
     });
-});
-const deleteWishlistItem = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+}));
+const deleteWishlistItem = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const wishlistItem = yield wishlist_service_1.WishlistService.deleteWishlistItem(id);
     (0, sendResponse_1.default)(res, {
@@ -48,7 +49,7 @@ const deleteWishlistItem = (req, res) => __awaiter(void 0, void 0, void 0, funct
         message: 'wishlist item deleted successfully',
         data: wishlistItem
     });
-});
+}));
 exports.WishlistController = {
     createWishlistItem,
     getWishlistItems,

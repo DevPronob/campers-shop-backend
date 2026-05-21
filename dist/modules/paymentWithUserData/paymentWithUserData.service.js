@@ -17,8 +17,6 @@ const stripe_1 = __importDefault(require("stripe"));
 const config_1 = __importDefault(require("../../config"));
 const paymentWithUserData_model_1 = require("./paymentWithUserData.model");
 const AppError_1 = __importDefault(require("../../errors/AppError"));
-const cart_model_1 = require("../cart/cart.model");
-const mongoose_1 = __importDefault(require("mongoose"));
 const stripe = new stripe_1.default(config_1.default.stripe);
 const setPayment = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { price } = payload;
@@ -41,33 +39,51 @@ const setPayment = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 const setUserPayment = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const session = yield mongoose_1.default.startSession();
-    session.startTransaction();
     try {
-        const result = yield paymentWithUserData_model_1.Payment.create([payload], { session });
-        yield cart_model_1.Cart.deleteMany({ userId: payload.userId }).session(session);
-        yield session.commitTransaction();
-        session.endSession();
+        const result = yield paymentWithUserData_model_1.Payment.create(payload);
         console.log(`Payment created & cart deleted for user: ${payload.userId}`);
-        return result[0];
+        return result;
     }
     catch (error) {
-        yield session.abortTransaction();
-        session.endSession();
         throw error;
     }
 });
 const getPaymentById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(id);
     const payment = yield paymentWithUserData_model_1.Payment.find({ userId: id });
-    console.log(payment);
+    console.log(payment, "payment");
     if (!payment) {
         throw new AppError_1.default(404, "Payment not found");
     }
     return payment;
 });
+const getpayments = () => __awaiter(void 0, void 0, void 0, function* () {
+    const payments = yield paymentWithUserData_model_1.Payment.find();
+    return payments;
+});
+const updateOrderStatus = (paymentId, status) => __awaiter(void 0, void 0, void 0, function* () {
+    const payment = yield paymentWithUserData_model_1.Payment.findById(paymentId);
+    if (!payment) {
+        throw new AppError_1.default(404, "Payment not found");
+    }
+    payment.status = status;
+    yield payment.save();
+    return payment;
+});
+const cancleOrder = (paymentId) => __awaiter(void 0, void 0, void 0, function* () {
+    const payment = yield paymentWithUserData_model_1.Payment.findById(paymentId);
+    if (!payment) {
+        throw new AppError_1.default(404, "Payment not found");
+    }
+    payment.status = "canceled";
+    yield payment.save();
+    return payment;
+});
 exports.paymentService = {
     setPayment,
     setUserPayment,
-    getPaymentById
+    getPaymentById,
+    getpayments,
+    updateOrderStatus,
+    cancleOrder,
 };

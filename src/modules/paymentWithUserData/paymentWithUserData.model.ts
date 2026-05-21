@@ -8,6 +8,10 @@ const paymentSchema = new Schema({
     address: { type: String, required: true },
     phone: { type: String, required: false },
     userId: { type: String, required: true },
+    status: { type: String, required: true, default: 'pending' },
+    amount: { type: Number, required: true },
+    quantity: { type: Number, required: true },
+   products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
     // cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart', required: true },
     stripePaymentId: { type: String, required: true },
 }, { timestamps: true });

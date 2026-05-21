@@ -8,7 +8,15 @@ import { USER_ROLE } from '../user/user.constant'
 
 const router = express.Router()
 router.post('/createPayment',paymentController.createPayment)
+router.get('/orders',auth(USER_ROLE.USER,USER_ROLE.ADMIN),paymentController.getPaymentById)
+router.get('/allPayments',auth(USER_ROLE.ADMIN), paymentController.getPayments)
+router.put('/updateOrderStatus/:id',auth(USER_ROLE.ADMIN), validateRequest(paymentValidation.updateOrderStatusValidationSchema), paymentController.updateOrderStatus)
 router.post('/',auth(USER_ROLE.USER),validateRequest(paymentValidation.paymentValidationSchema), paymentController.createPaymentWithUser)
-router.get('/',auth(USER_ROLE.USER), paymentController.getPaymentById)
+router.put(
+  "/cancelOrder/:id",
+  auth(USER_ROLE.ADMIN, USER_ROLE.USER),
+    paymentController.cancleOrder
+);
+
 
 export const paymentRoute = router

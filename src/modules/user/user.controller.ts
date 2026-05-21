@@ -4,8 +4,9 @@ import { userService } from "./user.service";
 import sendResponse from "../../utilitis/sendResponse";
 import { setAuthCookie } from "../../utilitis/setCookie";
 import { IUser, IUserDocument } from "./user.interface";
+import catchAsync from "../../utilitis/catchAsync";
 
-const registerUser = async (req: Request, res: Response) => {
+const registerUser = catchAsync(async (req: Request, res: Response) => {
   const { name, email, password, address, phone } = req.body;
   const user = {
     name,
@@ -24,9 +25,11 @@ const registerUser = async (req: Request, res: Response) => {
     success: true,
   });
   
-};
+}
+);
 
-const logInUser = async (req: Request, res: Response) => {
+
+const logInUser = catchAsync(async (req: Request, res: Response) => {
   const { email, password } = req.body;
   console.log(email,password)
   const user = await userService.logInUser(email, password);
@@ -38,8 +41,8 @@ const logInUser = async (req: Request, res: Response) => {
     success: true,
   });
   
-};
-const getUserById = async (req: Request, res: Response) => {
+});
+const getUserById = catchAsync(async (req: Request, res: Response) => {
   const id = (req.user as IUserDocument)._id;
   const user = await userService.getUserById(id as any);
   sendResponse(res, {
@@ -48,8 +51,8 @@ const getUserById = async (req: Request, res: Response) => {
     data: user,
     success: true,
   });
-};
-const getUserByEmail = async (req: Request, res: Response) => {
+});
+const getUserByEmail = catchAsync(async (req: Request, res: Response) => {
   const { email } = req.params;
   const user = await userService.getUserByEmail(email);
   sendResponse(res, {
@@ -58,8 +61,8 @@ const getUserByEmail = async (req: Request, res: Response) => {
     data: user,
     success: true,
   });
-};
-const updateRoleByAdmin = async (req: Request, res: Response) => {
+});
+const updateRoleByAdmin = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { role } = req.body;
   const user = await userService.updateRoleByAdmin(id, role);
@@ -71,8 +74,8 @@ const updateRoleByAdmin = async (req: Request, res: Response) => {
   });
   console.log(id,role,"akkjff")
 
-};
-const getAllUsers = async (req: Request, res: Response) => {
+});
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   const users = await userService.getAllUsers();
   sendResponse(res, {
     statusCode: 200,
@@ -80,7 +83,7 @@ const getAllUsers = async (req: Request, res: Response) => {
     data: users,
     success: true,
   });
-};
+});
 
 export const userController = {
   registerUser,

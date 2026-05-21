@@ -9,7 +9,13 @@ const paymentValidationSchema = z.object({
         stripePaymentId: z.string()
     })
 })
+const updateOrderStatusValidationSchema = z.object({
+    body: z.object({
+        status: z.string()
+    })
+})
 
 export const paymentValidation = {
-    paymentValidationSchema
+    paymentValidationSchema,
+    updateOrderStatusValidationSchema
 }

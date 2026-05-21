@@ -1,4 +1,5 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import config from '../config';
 
 interface TokenPayload {
   _id: string;
@@ -27,3 +28,5 @@ export const verifyToken = (
     return null;
   }
 };
+
+console.log("JWT SECRET:", config.jwt_secret);

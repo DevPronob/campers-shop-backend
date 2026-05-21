@@ -16,18 +16,23 @@ const app_1 = __importDefault(require("./app"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const config_1 = __importDefault(require("./config"));
 const seedSuperAdmin_1 = require("./utilitis/seedSuperAdmin");
-function main() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield mongoose_1.default.connect(config_1.default.mongodb_url);
-            app_1.default.listen(config_1.default.port, () => {
-                console.log(`Example app listening on port ${process.env.PORT}`);
-            });
-        }
-        catch (error) {
-            console.log(error);
-        }
+// Connect to MongoDB
+const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield mongoose_1.default.connect(config_1.default.mongodb_url || "mongodb+srv://pronobroy3601:m3edI5rGJcZnDTcF@cluster0.kabo16c.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0");
+        console.log("Database connected successfully");
+        yield (0, seedSuperAdmin_1.seedSuperAdmin)();
+    }
+    catch (error) {
+        console.error("Database connection error:", error);
+    }
+});
+// Start database connection
+connectDB();
+// Only start the listener if we are running in a local environment (not Vercel)
+if (!process.env.VERCEL) {
+    app_1.default.listen(config_1.default.port, () => {
+        console.log(`Server running on port ${config_1.default.port}`);
     });
 }
-main();
-(0, seedSuperAdmin_1.seedSuperAdmin)();
+exports.default = app_1.default;

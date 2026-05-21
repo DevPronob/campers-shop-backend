@@ -11,6 +11,12 @@ const paymentValidationSchema = zod_1.z.object({
         stripePaymentId: zod_1.z.string()
     })
 });
+const updateOrderStatusValidationSchema = zod_1.z.object({
+    body: zod_1.z.object({
+        status: zod_1.z.string()
+    })
+});
 exports.paymentValidation = {
-    paymentValidationSchema
+    paymentValidationSchema,
+    updateOrderStatusValidationSchema
 };

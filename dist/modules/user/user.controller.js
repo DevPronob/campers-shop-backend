@@ -17,7 +17,8 @@ const user_constant_1 = require("./user.constant");
 const user_service_1 = require("./user.service");
 const sendResponse_1 = __importDefault(require("../../utilitis/sendResponse"));
 const setCookie_1 = require("../../utilitis/setCookie");
-const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const catchAsync_1 = __importDefault(require("../../utilitis/catchAsync"));
+const registerUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, password, address, phone } = req.body;
     const user = {
         name,
@@ -34,8 +35,8 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         data: result,
         success: true,
     });
-});
-const logInUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+}));
+const logInUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     console.log(email, password);
     const user = yield user_service_1.userService.logInUser(email, password);
@@ -46,8 +47,8 @@ const logInUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         data: user,
         success: true,
     });
-});
-const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+}));
+const getUserById = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.user._id;
     const user = yield user_service_1.userService.getUserById(id);
     (0, sendResponse_1.default)(res, {
@@ -56,8 +57,8 @@ const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         data: user,
         success: true,
     });
-});
-const getUserByEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+}));
+const getUserByEmail = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.params;
     const user = yield user_service_1.userService.getUserByEmail(email);
     (0, sendResponse_1.default)(res, {
@@ -66,8 +67,8 @@ const getUserByEmail = (req, res) => __awaiter(void 0, void 0, void 0, function*
         data: user,
         success: true,
     });
-});
-const updateRoleByAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+}));
+const updateRoleByAdmin = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const { role } = req.body;
     const user = yield user_service_1.userService.updateRoleByAdmin(id, role);
@@ -78,8 +79,8 @@ const updateRoleByAdmin = (req, res) => __awaiter(void 0, void 0, void 0, functi
         success: true,
     });
     console.log(id, role, "akkjff");
-});
-const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+}));
+const getAllUsers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const users = yield user_service_1.userService.getAllUsers();
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
@@ -87,7 +88,7 @@ const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         data: users,
         success: true,
     });
-});
+}));
 exports.userController = {
     registerUser,
     logInUser,

@@ -1,11 +1,10 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import AppError from "../errors/AppError";
-import config from "../config";
 import { User } from "../modules/user/user.model";
-import { JwtPayload } from 'jsonwebtoken';
 import { verifyToken } from "../utilitis/jwt";
+
 export const auth = (...userRoles: string[]) => {
-  return async (req: Request, res: Response, next: Function) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const token = req.cookies?.accessToken;
 
@@ -31,7 +30,6 @@ export const auth = (...userRoles: string[]) => {
       req.user = user;
       next();
     } catch (error) {
-      console.log("jwt error", error);
       next(error);
     }
   };

@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyToken = exports.generateToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_1 = __importDefault(require("../config"));
 const generateToken = (payload, secret) => {
     return jsonwebtoken_1.default.sign(payload, secret, { expiresIn: '1d' });
 };
@@ -24,3 +25,4 @@ const verifyToken = (token, secret) => {
     }
 };
 exports.verifyToken = verifyToken;
+console.log("JWT SECRET:", config_1.default.jwt_secret);

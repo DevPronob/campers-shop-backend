@@ -14,45 +14,95 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cartService = void 0;
 const AppError_1 = __importDefault(require("../../errors/AppError"));
-const cart_model_1 = require("./cart.model");
 const http_status_1 = __importDefault(require("http-status"));
+const cart_model_1 = require("./cart.model");
+const mongoose_1 = require("mongoose");
+// 🔹 Add product to cart
 const createCartIntoDb = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const isCartExits = yield cart_model_1.Cart.findById(payload.productId);
-    if (isCartExits) {
-        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Already Added To Cart");
+    const { userId, productId, quantity } = payload;
+    console.log(payload, "payload in createCartIntoDb");
+    let cart = yield cart_model_1.Cart.findOne({ userId });
+    // If cart does not exist
+    if (!cart) {
+        return yield cart_model_1.Cart.create({
+            userId,
+            items: [
+                {
+                    productId: new mongoose_1.Types.ObjectId(productId),
+                    quantity,
+                },
+            ],
+        });
     }
-    const result = yield cart_model_1.Cart.create(payload);
-    return result;
-});
-const getCartFrom = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield cart_model_1.Cart.find({ userId: id }).populate('productId');
-    return result;
-});
-const updateCartIntoDb = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const isCartExits = yield cart_model_1.Cart.findById(id);
-    if (!isCartExits) {
-        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Cart Not Found");
+    // Check if product already exists in cart
+    const item = cart.items.find((i) => i.productId.toString() === productId);
+    if (item) {
+        // Add quantity instead of just +1
+        item.quantity += quantity;
     }
-    const result = yield cart_model_1.Cart.findByIdAndUpdate(id, payload, {
-        new: true,
-        runValidators: true
-    });
-    return result;
-});
-const deleteCartFromDb = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(id);
-    const isCartExits = yield cart_model_1.Cart.findById(id);
-    if (!isCartExits) {
-        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Cart Product Not Found");
+    else {
+        cart.items.push({
+            productId: new mongoose_1.Types.ObjectId(productId),
+            quantity,
+        });
     }
-    console.log(isCartExits);
-    const result = yield cart_model_1.Cart.findOneAndDelete({ _id: isCartExits._id });
-    console.log(result);
-    return result;
+    yield cart.save();
+    return cart;
+});
+// 🔹 Get cart by user
+const getCartFromDb = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const cart = yield cart_model_1.Cart.findOne({ userId }).populate("items.productId");
+    // if (!cart) {
+    //   throw new AppError(httpStatus.NOT_FOUND, "Cart not found");
+    // }
+    return cart;
+});
+// 🔹 Update quantity
+const updateCartIntoDb = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId, productId, quantity } = payload;
+    console.log(payload, "payload in updateCartIntoDb");
+    const cart = yield cart_model_1.Cart.findOne({ userId });
+    console.log(productId, "cart in updateCartIntoDb");
+    if (!cart) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Cart not found");
+    }
+    const item = cart.items.find((i) => i.productId.toString() === productId);
+    console.log(item, "item in updateCartIntoDb");
+    if (!item) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Product not in cart");
+    }
+    console.log(quantity, "quantity in updateCartIntoDb");
+    item.quantity = quantity;
+    yield cart.save();
+    return cart;
+});
+// 🔹 Remove product from cart
+const deleteCartFromDb = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId, id } = payload;
+    const cart = yield cart_model_1.Cart.findOne({ userId });
+    console.log(cart, "cart in deleteCartFromDb");
+    if (!cart) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Cart not found");
+    }
+    cart.items = cart.items.filter((i) => i._id.toString() !== id);
+    console.log(cart, "cart after filter");
+    console.log(id, " after filter");
+    yield cart.save();
+    return cart;
+});
+// 🔹 Clear cart after order
+const clearCartFromDb = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const cart = yield cart_model_1.Cart.findOne({ userId });
+    if (!cart)
+        return null;
+    cart.items = [];
+    yield cart.save();
+    return cart;
 });
 exports.cartService = {
     createCartIntoDb,
-    getCartFrom,
+    getCartFromDb,
     updateCartIntoDb,
-    deleteCartFromDb
+    deleteCartFromDb,
+    clearCartFromDb,
 };

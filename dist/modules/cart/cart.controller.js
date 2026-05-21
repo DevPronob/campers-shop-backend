@@ -17,51 +17,78 @@ const catchAsync_1 = __importDefault(require("../../utilitis/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../utilitis/sendResponse"));
 const cart_service_1 = require("./cart.service");
 const http_status_1 = __importDefault(require("http-status"));
-const createCart = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// 🔹 ADD PRODUCT TO CART
+const addToCart = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.user;
-    const payload = Object.assign({ userId: user._id.toString() }, req.body);
-    console.log(user);
+    const payload = {
+        userId: user._id.toString(),
+        productId: req.body.productId,
+        quantity: req.body.quantity,
+    };
     const result = yield cart_service_1.cartService.createCartIntoDb(payload);
+    console.log(payload, "result");
+    //   return res.status(200).json({
+    //     success: true,
+    //     statusCode: httpStatus.CREATED,
+    //     message: "Product added to cart successfully",
+    //     data: payload,
+    //   });
     return (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.CREATED,
-        message: 'Cart created successfully',
-        data: result
+        message: "Product added to cart successfully",
+        data: result,
     });
 }));
+// 🔹 GET MY CART
 const getCart = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.user;
-    const result = yield cart_service_1.cartService.getCartFrom(user._id.toString());
+    const result = yield cart_service_1.cartService.getCartFromDb(user._id.toString());
+    console.log(result, "result");
     return (0, sendResponse_1.default)(res, {
         success: true,
-        statusCode: http_status_1.default.CREATED,
-        message: 'Cart Rectrive successfully',
-        data: result
+        statusCode: http_status_1.default.OK,
+        message: "Cart retrieved successfully",
+        data: result,
     });
 }));
+// 🔹 UPDATE PRODUCT QUANTITY
 const updateCart = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    const { quantity } = req.body;
     const { id } = req.params;
-    const result = yield cart_service_1.cartService.updateCartIntoDb(id, req.body);
+    console.log(req.body, "req.body in updateCart");
+    const result = yield cart_service_1.cartService.updateCartIntoDb({
+        userId: user._id.toString(),
+        productId: id,
+        quantity,
+    });
     return (0, sendResponse_1.default)(res, {
         success: true,
-        statusCode: http_status_1.default.CREATED,
-        message: 'Cart updated successfully',
-        data: result
+        statusCode: http_status_1.default.OK,
+        message: "Cart updated successfully",
+        data: result,
     });
 }));
+// 🔹 REMOVE PRODUCT FROM CART
 const deleteCart = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
     const { id } = req.params;
-    const result = yield cart_service_1.cartService.deleteCartFromDb(id);
+    console.log(req.params, "req.params");
+    const result = yield cart_service_1.cartService.deleteCartFromDb({
+        userId: user._id.toString(),
+        id,
+    });
     return (0, sendResponse_1.default)(res, {
         success: true,
-        statusCode: http_status_1.default.CREATED,
-        message: 'Cart deleted successfully',
-        data: result
+        statusCode: http_status_1.default.OK,
+        message: "Product removed from cart successfully",
+        data: result,
     });
 }));
 exports.cartController = {
-    createCart,
+    addToCart,
     getCart,
     updateCart,
-    deleteCart
+    deleteCart,
 };

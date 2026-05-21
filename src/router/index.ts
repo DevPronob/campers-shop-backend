@@ -5,6 +5,8 @@ import { cartRoute } from "../modules/cart/cart.router";
 import { paymentRoute } from "../modules/paymentWithUserData/paymentWithUserData.route";
 import {  userRoute } from "../modules/user/user.route";
 import { wishlistRoute } from "../modules/wishlist/wishlist.route";
+import { reviewRoute } from "../modules/review/review.route";
+import { orderRoute } from "../modules/order/order.route";
 
 const router = Router()
 const modeuleRoutes = [
@@ -31,6 +33,14 @@ const modeuleRoutes = [
     {
         path: '/wishlist',
         route: wishlistRoute
+    },
+    {
+        path: '/review',
+        route: reviewRoute
+    },
+    {
+        path: '/order',
+        route: orderRoute
     }
 ]
 

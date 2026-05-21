@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.orderRoute = void 0;
+const express_1 = require("express");
+const order_controller_1 = require("./order.controller");
+const validateRequest_1 = __importDefault(require("../../middleware/validateRequest"));
+const order_validation_1 = require("./order.validation");
+const user_constant_1 = require("../user/user.constant");
+const auth_1 = require("../../middleware/auth");
+const route = (0, express_1.Router)();
+route.post("/createOrder", (0, auth_1.auth)(user_constant_1.USER_ROLE.ADMIN, user_constant_1.USER_ROLE.USER), (0, validateRequest_1.default)(order_validation_1.orderValidation.createOrderValidationSchema), order_controller_1.OrderController.createOrder);
+route.get("/myOrders", (0, auth_1.auth)(user_constant_1.USER_ROLE.USER, user_constant_1.USER_ROLE.ADMIN), order_controller_1.OrderController.getMyOrders);
+route.get("/order/:id", order_controller_1.OrderController.getOrderById);
+route.put("/updateOrderStatus/:id", order_controller_1.OrderController.updateOrderStatus);
+route.put("/cancelOrder/:id", order_controller_1.OrderController.cancleOrder);
+route.get("/overview", (0, auth_1.auth)(user_constant_1.USER_ROLE.ADMIN, user_constant_1.USER_ROLE.USER), order_controller_1.OrderController.overviewOrder);
+exports.orderRoute = route;

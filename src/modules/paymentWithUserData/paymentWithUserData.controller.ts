@@ -6,6 +6,7 @@ import { Request, Response } from "express";
 import { IUser, IUserDocument } from "../user/user.interface";
 import { ObjectId } from 'mongoose';
 import AppError from "../../errors/AppError";
+import { Payment } from "./paymentWithUserData.model";
 
 
 const createPayment = catchAsync(async (req: Request, res: Response) => {
@@ -42,6 +43,44 @@ if (!user?._id) {
 }
 
 const result = await paymentService.getPaymentById(user._id.toString());
+    console.log(result,"result")
+    return sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: 'payment found',
+        data: result
+    })
+})
+
+const getPayments =catchAsync(async (req:Request,res:Response) =>{
+    const result = await paymentService.getpayments();
+    return sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: 'payment found',
+        data: result
+    })
+})
+
+const updateOrderStatus = catchAsync(async (req: Request, res: Response) => {
+    const payment = await Payment.findOne({_id:req.params.id}); 
+    console.log(payment,"payment")
+    const result = await paymentService.updateOrderStatus((payment as any)._id, req.body.status);
+    console.log(result,"result")
+    return sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: 'payment found',
+        data: result
+    })
+    console.log(req.params.id,"req.params.id",req.body.status,"req.body.status")
+})
+const cancleOrder = catchAsync(async (req: Request, res: Response) => {
+    const payment = await Payment.findById(req.params.id);
+    if (!payment) {
+        throw new AppError(404, "Payment not found");
+    }
+    const result = await paymentService.cancleOrder(req.params.id);
     return sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
@@ -54,5 +93,8 @@ const result = await paymentService.getPaymentById(user._id.toString());
 export const paymentController = {
     createPayment,
     createPaymentWithUser,
-    getPaymentById
+    getPaymentById,
+    getPayments,
+    updateOrderStatus,
+    cancleOrder
 }

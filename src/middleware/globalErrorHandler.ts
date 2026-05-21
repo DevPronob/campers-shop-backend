@@ -1,76 +1,64 @@
-import { ErrorRequestHandler, Request, Response, NextFunction } from "express";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { NextFunction, Request, Response } from "express";
 import handleDuplicateError from "../errors/handleDuplicateError";
-import handleValidationError from "../errors/handleValidationError";
-import handleZodError from "../errors/handleZodError";
 import handleCastError from "../errors/handleCastError";
+import handleZodError from "../errors/handleZodError";
+import handleValidationError from "../errors/handleValidationError";
 import AppError from "../errors/AppError";
-import { ZodError } from "zod";
-import config from "../config";
-// import config from "../config"; // uncomment if you need NODE_ENV
 
-const globalErrorHandler: ErrorRequestHandler = async(
+export const globalErrorHandler = (
   err: any,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  // Default values
-  let statusCode = err.statusCode || 500;
-  let message = err.message || "Something went wrong!";
-  let errorSources = [
-    {
-      path: "",
-      message: "Something went wrong!",
-    },
-  ];
+  let errorSources: any[] = [];
+  let statusCode = 500;
+  let message = "Something Went Wrong!!";
 
-  // 🔹 Handle Mongoose duplicate key error
-  if (err?.code === 11000) {
-    const simplifiedError = await handleDuplicateError(err);
+  console.log(err, "global error handler");
+
+  // Duplicate Error (MongoDB)
+  if (err.code === 11000) {
+    const simplifiedError = handleDuplicateError(err);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+  }
+  // ObjectId / Cast Error
+  else if (err.name === "CastError") {
+    const simplifiedError = handleCastError(err);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+  }
+  // Zod Validation Error
+  else if (err.name === "ZodError") {
+    const simplifiedError = handleZodError(err);
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
     errorSources = simplifiedError.errorSources;
   }
-  // 🔹 Handle Mongoose validation error
-  else if (err?.name === "ValidationError") {
-    const simplifiedError = await handleValidationError(err);
+  // Mongoose Validation Error
+  else if (err.name === "ValidationError") {
+    const simplifiedError = handleValidationError(err);
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
     errorSources = simplifiedError.errorSources;
   }
-  // 🔹 Handle Zod validation error
-  else if (err instanceof ZodError) {
-    const simplifiedError =await handleZodError(err);
-    statusCode = simplifiedError.statusCode;
-    message = simplifiedError.message;
-    errorSources = simplifiedError.errorSources;
-  }
-  // 🔹 Handle Mongoose cast error (invalid ObjectId, etc.)
-  else if (err?.name === "CastError") {
-    const simplifiedError =await handleCastError(err);
-    statusCode = simplifiedError.statusCode;
-    message = simplifiedError.message;
-    errorSources = simplifiedError.errorSources;
-  }
-  // 🔹 Handle custom AppError
-  else if (await err instanceof AppError) {
+  // Custom App Error
+  else if (err instanceof AppError) {
     statusCode = err.statusCode;
     message = err.message;
-    errorSources = [
-      {
-        path: "",
-        message: err.message,
-      },
-    ];
+  }
+  // Generic Error
+  else if (err instanceof Error) {
+    message = err.message;
   }
 
-  // Final response
-  return res.status(statusCode).json({
+  res.status(statusCode).json({
     success: false,
     message,
     errorSources,
-    stack: config.node_env === "development" ? err.stack : null,
+    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
   });
 };
-
-export default globalErrorHandler;

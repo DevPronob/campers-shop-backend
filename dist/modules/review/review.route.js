@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.reviewRoute = void 0;
+const express_1 = require("express");
+const review_controller_1 = require("./review.controller");
+const auth_1 = require("../../middleware/auth");
+const user_constant_1 = require("../user/user.constant");
+const router = (0, express_1.Router)();
+router.post("/", (0, auth_1.auth)(user_constant_1.USER_ROLE.USER, user_constant_1.USER_ROLE.ADMIN), review_controller_1.reviewController.createReview);
+router.get("/:id", (0, auth_1.auth)(user_constant_1.USER_ROLE.USER, user_constant_1.USER_ROLE.ADMIN), review_controller_1.reviewController.getReviewById);
+router.get("/product/:productId", (0, auth_1.auth)(user_constant_1.USER_ROLE.USER, user_constant_1.USER_ROLE.ADMIN), review_controller_1.reviewController.getReviewByProductId);
+router.get("/:userId", (0, auth_1.auth)(user_constant_1.USER_ROLE.USER, user_constant_1.USER_ROLE.ADMIN), review_controller_1.reviewController.getReviewByUserId);
+router.put("/update/:id", (0, auth_1.auth)(user_constant_1.USER_ROLE.USER, user_constant_1.USER_ROLE.ADMIN), review_controller_1.reviewController.updateReviewById);
+router.delete("/:id", (0, auth_1.auth)(user_constant_1.USER_ROLE.USER, user_constant_1.USER_ROLE.ADMIN), review_controller_1.reviewController.deleteReviewById);
+exports.reviewRoute = router;

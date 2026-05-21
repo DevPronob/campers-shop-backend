@@ -39,7 +39,6 @@ const auth = (...userRoles) => {
             next();
         }
         catch (error) {
-            console.log("jwt error", error);
             next(error);
         }
     });

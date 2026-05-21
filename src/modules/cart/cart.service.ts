@@ -1,53 +1,135 @@
-import AppError from "../../errors/AppError"
-import { TCart } from "./cart.interface"
-import { Cart } from "./cart.model"
+import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
+import { Cart } from "./cart.model";
+import { Types } from "mongoose";
 
-const createCartIntoDb = async (payload: TCart) => {
-    const isCartExits = await Cart.findById(payload.productId)
-    if (isCartExits) {
-        throw new AppError(httpStatus.NOT_FOUND, "Already Added To Cart")
-    }
-    const result = await Cart.create(payload)
-    return result
-}
+// 🔹 Add product to cart
+const createCartIntoDb = async (payload: {
+  userId: string;
+  productId: string;
+  quantity: number;
+}) => {
+  const { userId, productId, quantity } = payload;
+  console.log(payload,"payload in createCartIntoDb")
 
-const getCartFrom = async (id: string) => {
-    const result = await Cart.find({userId:id}).populate('productId')
-    return result
-}
+  let cart = await Cart.findOne({ userId });
 
-const updateCartIntoDb = async (id: string, payload: TCart) => {
-    const isCartExits = await Cart.findById(id)
-    if (!isCartExits) {
-        throw new AppError(httpStatus.NOT_FOUND, "Cart Not Found")
-    }
+  // If cart does not exist
+  if (!cart) {
+    return await Cart.create({
+      userId,
+      items: [
+        {
+          productId: new Types.ObjectId(productId),
+          quantity,
+        },
+      ],
+    });
+  }
 
-    const result = await Cart.findByIdAndUpdate(id, payload, {
-        new: true,
-        runValidators: true
-    })
-    return result
-}
+  // Check if product already exists in cart
+  const item = cart.items.find(
+    (i) => i.productId.toString() === productId
+  );
 
-const deleteCartFromDb = async (id: string) => {
-    console.log(id)
-    const isCartExits = await Cart.findById(id)
-    if (!isCartExits) {
-        throw new AppError(httpStatus.NOT_FOUND, "Cart Product Not Found")
-    }
+  if (item) {
+    // Add quantity instead of just +1
+    item.quantity += quantity;
+  } else {
+    cart.items.push({
+      productId: new Types.ObjectId(productId),
+      quantity,
+    });
+  }
 
-    console.log(isCartExits)
+  await cart.save();
+  return cart;
+};
 
-    const result = await Cart.findOneAndDelete({ _id: isCartExits._id })
-    console.log(result)
-    return result
-}
+// 🔹 Get cart by user
+const getCartFromDb = async (userId: string) => {
+  const cart = await Cart.findOne({ userId }).populate(
+    "items.productId"
+  );
 
+  // if (!cart) {
+  //   throw new AppError(httpStatus.NOT_FOUND, "Cart not found");
+  // }
+
+  return cart;
+};
+
+// 🔹 Update quantity
+const updateCartIntoDb = async (payload: {
+  userId: string;
+  productId: string;
+  quantity: number;
+}) => {
+  const { userId, productId, quantity } = payload;
+  console.log(payload,"payload in updateCartIntoDb")
+
+  const cart = await Cart.findOne({ userId });
+  console.log(productId,"cart in updateCartIntoDb")
+
+  if (!cart) {
+    throw new AppError(httpStatus.NOT_FOUND, "Cart not found");
+  }
+
+ const item =cart.items.find((i) => i.productId.toString() === productId);
+ console.log(item,"item in updateCartIntoDb")
+
+  if (!item) {
+    throw new AppError(httpStatus.NOT_FOUND, "Product not in cart");
+  }
+  console.log(quantity,"quantity in updateCartIntoDb")
+
+  item.quantity = quantity;
+  await cart.save();
+
+  return cart;
+};
+
+// 🔹 Remove product from cart
+const deleteCartFromDb = async (payload: {
+  userId: string;
+  id: string;
+}) => {
+  const { userId, id } = payload;
+
+  const cart = await Cart.findOne({ userId });
+  console.log(cart,"cart in deleteCartFromDb")
+
+  if (!cart) {
+    throw new AppError(httpStatus.NOT_FOUND, "Cart not found");
+  }
+
+  cart.items = cart.items.filter(
+    (i:any) => i._id.toString() !== id
+  );
+
+  console.log(cart,"cart after filter")
+  console.log(id," after filter")
+
+  await cart.save();
+  return cart;
+  
+};
+
+// 🔹 Clear cart after order
+const clearCartFromDb = async (userId: string) => {
+  const cart = await Cart.findOne({ userId });
+
+  if (!cart) return null;
+
+  cart.items = [];
+  await cart.save();
+  return cart;
+};
 
 export const cartService = {
-    createCartIntoDb,
-    getCartFrom,
-    updateCartIntoDb,
-    deleteCartFromDb
-}
+  createCartIntoDb,
+  getCartFromDb,
+  updateCartIntoDb,
+  deleteCartFromDb,
+  clearCartFromDb,
+};

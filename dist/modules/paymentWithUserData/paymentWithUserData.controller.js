@@ -18,6 +18,7 @@ const catchAsync_1 = __importDefault(require("../../utilitis/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../utilitis/sendResponse"));
 const paymentWithUserData_service_1 = require("./paymentWithUserData.service");
 const AppError_1 = __importDefault(require("../../errors/AppError"));
+const paymentWithUserData_model_1 = require("./paymentWithUserData.model");
 const createPayment = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield paymentWithUserData_service_1.paymentService.setPayment(req.body);
     return (0, sendResponse_1.default)(res, {
@@ -45,6 +46,42 @@ const getPaymentById = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
         throw new AppError_1.default(401, "You are not authorized to access this route");
     }
     const result = yield paymentWithUserData_service_1.paymentService.getPaymentById(user._id.toString());
+    console.log(result, "result");
+    return (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: 'payment found',
+        data: result
+    });
+}));
+const getPayments = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield paymentWithUserData_service_1.paymentService.getpayments();
+    return (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: 'payment found',
+        data: result
+    });
+}));
+const updateOrderStatus = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const payment = yield paymentWithUserData_model_1.Payment.findOne({ _id: req.params.id });
+    console.log(payment, "payment");
+    const result = yield paymentWithUserData_service_1.paymentService.updateOrderStatus(payment._id, req.body.status);
+    console.log(result, "result");
+    return (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: 'payment found',
+        data: result
+    });
+    console.log(req.params.id, "req.params.id", req.body.status, "req.body.status");
+}));
+const cancleOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const payment = yield paymentWithUserData_model_1.Payment.findById(req.params.id);
+    if (!payment) {
+        throw new AppError_1.default(404, "Payment not found");
+    }
+    const result = yield paymentWithUserData_service_1.paymentService.cancleOrder(req.params.id);
     return (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
@@ -55,5 +92,8 @@ const getPaymentById = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
 exports.paymentController = {
     createPayment,
     createPaymentWithUser,
-    getPaymentById
+    getPaymentById,
+    getPayments,
+    updateOrderStatus,
+    cancleOrder
 };

@@ -7,6 +7,8 @@ const cart_router_1 = require("../modules/cart/cart.router");
 const paymentWithUserData_route_1 = require("../modules/paymentWithUserData/paymentWithUserData.route");
 const user_route_1 = require("../modules/user/user.route");
 const wishlist_route_1 = require("../modules/wishlist/wishlist.route");
+const review_route_1 = require("../modules/review/review.route");
+const order_route_1 = require("../modules/order/order.route");
 const router = (0, express_1.Router)();
 const modeuleRoutes = [
     {
@@ -32,6 +34,14 @@ const modeuleRoutes = [
     {
         path: '/wishlist',
         route: wishlist_route_1.wishlistRoute
+    },
+    {
+        path: '/review',
+        route: review_route_1.reviewRoute
+    },
+    {
+        path: '/order',
+        route: order_route_1.orderRoute
     }
 ];
 modeuleRoutes.forEach((ele) => router.use(ele.path, ele.route));
