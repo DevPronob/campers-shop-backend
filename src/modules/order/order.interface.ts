@@ -4,6 +4,6 @@ export interface IOrder {
   _id?: string;
   userId: string;
   status: OrderStatus;
-  cartId: string;        // single cart reference
+  cartId: string;
   paymentId?: string;
 }

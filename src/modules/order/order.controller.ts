@@ -94,6 +94,20 @@ const overviewOrder = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const deleteOrderById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  console.log(id,"order id in deleteOrderById");
+
+  const order = await OrderService.deleteOrderById(id);
+
+  return sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Order deleted successfully",
+    data: order,
+  });
+});
+
 export const OrderController = {
   createOrder,
   getOrderById,
@@ -101,4 +115,5 @@ export const OrderController = {
   updateOrderStatus,
   cancleOrder,
   overviewOrder,
+  deleteOrderById
 };

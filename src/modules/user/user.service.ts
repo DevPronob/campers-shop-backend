@@ -61,7 +61,7 @@ const updateRoleByAdmin = async (id: string, role: string) => {
   const updatedUser = await User.findByIdAndUpdate(
     id,
     { role },
-    { new: true, runValidators: true } // return updated doc + validate
+    { new: true, runValidators: true }
   );
 
   return updatedUser;

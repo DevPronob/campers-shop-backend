@@ -24,8 +24,7 @@ const setPayment = async (payload: PaymentPayload): Promise<PaymentResponse> => 
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: 'usd',
-      payment_method_types: ['card'],
-      // You can also attach metadata if needed
+      payment_method_types: ['card'],
       metadata: { integration_check: 'accept_a_payment' },
     });
 

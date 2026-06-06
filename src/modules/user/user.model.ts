@@ -21,8 +21,7 @@ if(this.isModified("password")){
 }
 next()
 }
-)
-// ✅ Document method
+)
 userSchema.methods.comparePassword = async function (
   password: string
 ): Promise<boolean> {

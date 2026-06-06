@@ -26,13 +26,9 @@ class QueryBuilder<T> {
     }
 
     filter() {
-        const queryObj = { ...this.query }; // Copy query object
-
-        // Filtering out unwanted fields
+        const queryObj = { ...this.query };
         const excludeFields = ['searchTerm', 'sort'];
-        excludeFields.forEach(el => delete queryObj[el]);
-
-        // Handle price range filtering if defined
+        excludeFields.forEach(el => delete queryObj[el]);
         const priceFilter:any = {};
         if (queryObj.minPrice !== undefined) {
             priceFilter.$gte = queryObj.minPrice;
@@ -56,17 +52,7 @@ class QueryBuilder<T> {
         this.modelQuery = this.modelQuery.sort(sort as string);
 
         return this;
-    }
-
-    // paginate() {
-    //     const page = Number(this?.query?.page) || 1;
-    //     const limit = Number(this?.query?.limit) || 10;
-    //     const skip = (page - 1) * limit;
-
-    //     this.modelQuery = this.modelQuery.skip(skip).limit(limit);
-
-    //     return this;
-    // }
+    }
 
 
 }

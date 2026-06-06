@@ -4,8 +4,7 @@ import config from '../config';
 interface TokenPayload {
   _id: string;
   email: string;
-  role: string;
-  // add more fields if needed
+  role: string;
 }
 
 export const generateToken = (payload: TokenPayload, secret: string): string => {
@@ -20,7 +19,7 @@ export const verifyToken = (
     console.log(token,"token in verify", secret)
     const decoded = jwt.verify(token, secret);
     if (typeof decoded === 'string') {
-      return null; // in case it's a string instead of an object
+      return null;
     }
     return decoded;
   } catch (error) {

@@ -1,9 +1,7 @@
 import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
 import { Cart } from "./cart.model";
-import { Types } from "mongoose";
-
-// 🔹 Add product to cart
+import { Types } from "mongoose";
 const createCartIntoDb = async (payload: {
   userId: string;
   productId: string;
@@ -12,9 +10,7 @@ const createCartIntoDb = async (payload: {
   const { userId, productId, quantity } = payload;
   console.log(payload,"payload in createCartIntoDb")
 
-  let cart = await Cart.findOne({ userId });
-
-  // If cart does not exist
+  let cart = await Cart.findOne({ userId });
   if (!cart) {
     return await Cart.create({
       userId,
@@ -25,15 +21,12 @@ const createCartIntoDb = async (payload: {
         },
       ],
     });
-  }
-
-  // Check if product already exists in cart
+  }
   const item = cart.items.find(
     (i) => i.productId.toString() === productId
   );
 
-  if (item) {
-    // Add quantity instead of just +1
+  if (item) {
     item.quantity += quantity;
   } else {
     cart.items.push({
@@ -44,22 +37,14 @@ const createCartIntoDb = async (payload: {
 
   await cart.save();
   return cart;
-};
-
-// 🔹 Get cart by user
+};
 const getCartFromDb = async (userId: string) => {
   const cart = await Cart.findOne({ userId }).populate(
     "items.productId"
-  );
-
-  // if (!cart) {
-  //   throw new AppError(httpStatus.NOT_FOUND, "Cart not found");
-  // }
+  );
 
   return cart;
-};
-
-// 🔹 Update quantity
+};
 const updateCartIntoDb = async (payload: {
   userId: string;
   productId: string;
@@ -87,9 +72,7 @@ const updateCartIntoDb = async (payload: {
   await cart.save();
 
   return cart;
-};
-
-// 🔹 Remove product from cart
+};
 const deleteCartFromDb = async (payload: {
   userId: string;
   id: string;
@@ -113,9 +96,7 @@ const deleteCartFromDb = async (payload: {
   await cart.save();
   return cart;
   
-};
-
-// 🔹 Clear cart after order
+};
 const clearCartFromDb = async (userId: string) => {
   const cart = await Cart.findOne({ userId });
 

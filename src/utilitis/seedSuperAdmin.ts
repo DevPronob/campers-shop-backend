@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { User } from '../modules/user/user.model';
 
 export const seedSuperAdmin = async () => {

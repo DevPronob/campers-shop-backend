@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import router from './router';
 import cors from 'cors';
 import notFound from './middleware/notFound';
@@ -10,6 +10,7 @@ import { seedSuperAdmin } from './utilitis/seedSuperAdmin';
 
 const app = express();
 
+// CORS
 const corsOptions = {
   origin: [
     'https://campers-ecom-frontend.vercel.app',
@@ -18,61 +19,37 @@ const corsOptions = {
   credentials: true,
 };
 
-// ✅ CORS must come first, before any routes
 app.use(cors(corsOptions));
-
-// ✅ Handle OPTIONS preflight requests
 app.options('*', cors(corsOptions));
-
-// Database connection caching for Serverless
-let dbConnectionPromise: Promise<any> | null = null;
-
-const connectDB = () => {
-  if (!dbConnectionPromise) {
-    dbConnectionPromise = mongoose.connect(config.mongodb_url || "mongodb+srv://pronobroy3601:m3edI5rGJcZnDTcF@cluster0.kabo16c.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-      .then(async () => {
-        console.log("Database connected successfully");
-        try {
-          await seedSuperAdmin();
-        } catch (err) {
-          console.error("Super admin seeding failed:", err);
-        }
-      })
-      .catch((error) => {
-        console.error("Database connection error:", error);
-        dbConnectionPromise = null; // Reset connection promise to allow retrying on the next request
-        throw error;
-      });
-  }
-  return dbConnectionPromise;
-};
-
-// Start database connection in the background as soon as module loads
-connectDB();
-
-// Middleware to ensure DB connection before handling any requests
-app.use(async (req, res, next) => {
-  try {
-    await connectDB();
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// DB — connect once on startup, no per-request reconnect needed
+// mongoose handles connection pooling internally
+const connectDB = async () => {
+  try {
+    await mongoose.connect(config.mongodb_url as string);
+    console.log('Database connected successfully');
+    await seedSuperAdmin();
+  } catch (error) {
+    console.error('Database connection error:', error);
+    process.exit(1); // crash fast on startup failure
+  }
+};
+
+connectDB();
+
 // Routes
 app.use('/api', router);
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.send('Hello World!');
 });
 
-// Error handling
+// Error handlers — must be last
 app.use(notFound);
 app.use(globalErrorHandler);
 

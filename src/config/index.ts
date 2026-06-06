@@ -1,6 +1,4 @@
-import dotenv from 'dotenv';
-
-// Load .env only in development
+import dotenv from 'dotenv';
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
 }
@@ -22,7 +20,7 @@ requiredEnvVars.forEach((key) => {
 const config = {
   port: process.env.PORT || '5000',
   mongodb_url: process.env.MONGODB_URL as string,
-  stripe: process.env.STRIPE || '', // optional
+  stripe: process.env.STRIPE || '',
   jwt_secret: process.env.JWT_SECRET as string,
   node_env: process.env.NODE_ENV as 'development' | 'production',
   email: process.env.EMAIL as string,

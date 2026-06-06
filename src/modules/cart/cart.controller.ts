@@ -2,9 +2,7 @@ import { Request, Response } from "express";
 import catchAsync from "../../utilitis/catchAsync";
 import sendResponse from "../../utilitis/sendResponse";
 import { cartService } from "./cart.service";
-import httpStatus from "http-status";
-
-// 🔹 ADD PRODUCT TO CART
+import httpStatus from "http-status";
 const addToCart = catchAsync(async (req: Request, res: Response) => {
   const user = req.user as any;
 
@@ -15,13 +13,7 @@ const addToCart = catchAsync(async (req: Request, res: Response) => {
   };
 
   const result = await cartService.createCartIntoDb(payload as any);
-  console.log(payload,"result")
-//   return res.status(200).json({
-//     success: true,
-//     statusCode: httpStatus.CREATED,
-//     message: "Product added to cart successfully",
-//     data: payload,
-//   });
+  console.log(payload,"result")
 
   return sendResponse(res, {
     success: true,
@@ -29,9 +21,7 @@ const addToCart = catchAsync(async (req: Request, res: Response) => {
     message: "Product added to cart successfully",
     data: result,
   });
-});
-
-// 🔹 GET MY CART
+});
 const getCart = catchAsync(async (req: Request, res: Response) => {
   const user = req.user as any;
 
@@ -45,9 +35,7 @@ const getCart = catchAsync(async (req: Request, res: Response) => {
     message: "Cart retrieved successfully",
     data: result,
   });
-});
-
-// 🔹 UPDATE PRODUCT QUANTITY
+});
 const updateCart = catchAsync(async (req: Request, res: Response) => {
   const user = req.user as any;
   const {quantity } = req.body;
@@ -66,9 +54,7 @@ const updateCart = catchAsync(async (req: Request, res: Response) => {
     message: "Cart updated successfully",
     data: result,
   });
-});
-
-// 🔹 REMOVE PRODUCT FROM CART
+});
 const deleteCart = catchAsync(async (req: Request, res: Response) => {
   const user = req.user as any;
   const { id } = req.params;

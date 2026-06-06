@@ -13,5 +13,6 @@ route.get("/order/:id",OrderController.getOrderById);
 route.put("/updateOrderStatus/:id",OrderController.updateOrderStatus);
 route.put("/cancelOrder/:id",OrderController.cancleOrder);
 route.get("/overview",auth(USER_ROLE.ADMIN,USER_ROLE.USER),OrderController.overviewOrder);
+route.delete("/deleteOrder/:id",auth(USER_ROLE.USER,USER_ROLE.ADMIN),OrderController.deleteOrderById);
 
 export const orderRoute = route;

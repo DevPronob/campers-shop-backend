@@ -8,8 +8,7 @@ const router = express.Router()
 router.post('/',auth(USER_ROLE.ADMIN), categoryController.createCategory)
 router.get('/',auth(USER_ROLE.ADMIN,USER_ROLE.USER), categoryController.getCategory)
 
-router.get('/:id',auth(USER_ROLE.ADMIN,USER_ROLE.USER), categoryController.getSingleCategory)
-// router.get('/:id', productController.getSingleProduct)
+router.get('/:id',auth(USER_ROLE.ADMIN,USER_ROLE.USER), categoryController.getSingleCategory)
 
 
 export const categoryRoute = router

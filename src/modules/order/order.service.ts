@@ -2,6 +2,7 @@ import { Order } from "./order.model";
 import { Cart } from "../cart/cart.model";
 import { ORDER_STATUS, OrderStatus } from "./order.constant";
 import mongoose from "mongoose";
+import { Payment } from "../paymentWithUserData/paymentWithUserData.model";
 
 interface CreateOrderPayload {
   userId: string;
@@ -24,7 +25,7 @@ const createOrder = async (payload: CreateOrderPayload) => {
       throw new Error("Cart not found");
     }
 
-    const order = await Order.create(
+    const createdOrders = await Order.create(
       [
         {
           userId: payload.userId,
@@ -37,13 +38,20 @@ const createOrder = async (payload: CreateOrderPayload) => {
       { session }
     );
 
-  
     await Cart.findByIdAndDelete(cart._id).session(session);
+    const order = await Order.findById(createdOrders[0]._id).populate("cartId").session(session);
+    console.log(order, "order in createOrder");
+    if (!order) {
+      throw new Error("Order not found after creation");
+    }
+    order.status = payload.status ? ORDER_STATUS.PAID : ORDER_STATUS.PENDING;
+    order.totalPrice = payload.totalPrice || 0;
+    await order.save();
 
     await session.commitTransaction();
     session.endSession();
 
-    return order[0];
+    return order;
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -83,7 +91,6 @@ const updateOrderStatus = async (
     throw new Error("Order status is invalid");
   }
 
-  // 🔒 Status transition rules
   const validTransitions: Record<OrderStatus, OrderStatus[]> = {
     pending: ["paid", "failed", "cancelled"],
     paid: ["rejected"],
@@ -125,11 +132,31 @@ return {
 }
 
 }
+
+const deleteOrderById = async (id: string) => {
+  const order = await Order.findOne({
+    $or: [{ _id: id }, { paymentId: id }]
+  });
+  const payment = await Payment.findById(id);
+
+  if (!order && !payment) {
+    throw new Error("Order not found");
+  }
+
+  if (order) {
+    await Order.findByIdAndDelete(order._id);
+  }
+
+  if (payment) {
+    await Payment.findByIdAndDelete(payment._id);
+  }
+}
 export const OrderService = {
   createOrder,
   getOrderById,
   getUserOrders,
   updateOrderStatus,
   cancleOrder,
-  overviewOrder
+  overviewOrder,
+  deleteOrderById
 };

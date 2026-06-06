@@ -9,7 +9,7 @@ const validateRequest = (schema: AnyZodObject) => {
             });
             next();
         } catch (error) {
-            next(error); // ← sends ZodError to globalErrorHandler automatically
+            next(error);
         }
     };
 };

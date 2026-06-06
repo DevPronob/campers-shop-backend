@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
+
 import { NextFunction, Request, Response } from "express";
 import handleDuplicateError from "../errors/handleDuplicateError";
 import handleCastError from "../errors/handleCastError";
@@ -17,40 +17,33 @@ export const globalErrorHandler = (
   let statusCode = 500;
   let message = "Something Went Wrong!!";
 
-  console.log(err, "global error handler");
-
-  // Duplicate Error (MongoDB)
+  console.log(err, "global error handler");
   if (err.code === 11000) {
     const simplifiedError = handleDuplicateError(err);
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
-  }
-  // ObjectId / Cast Error
+  }
   else if (err.name === "CastError") {
     const simplifiedError = handleCastError(err);
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
-  }
-  // Zod Validation Error
+  }
   else if (err.name === "ZodError") {
     const simplifiedError = handleZodError(err);
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
     errorSources = simplifiedError.errorSources;
-  }
-  // Mongoose Validation Error
+  }
   else if (err.name === "ValidationError") {
     const simplifiedError = handleValidationError(err);
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
     errorSources = simplifiedError.errorSources;
-  }
-  // Custom App Error
+  }
   else if (err instanceof AppError) {
     statusCode = err.statusCode;
     message = err.message;
-  }
-  // Generic Error
+  }
   else if (err instanceof Error) {
     message = err.message;
   }

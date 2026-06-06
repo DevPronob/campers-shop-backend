@@ -9,9 +9,7 @@ export interface IUser {
   phone: string;
   role?: typeof USER_ROLE | string;
   payment?: Types.ObjectId | null;
-}
-
-// Document = one user instance
+}
 export interface IUserDocument extends IUser, Document {
      _id?: Types.ObjectId;
   comparePassword(password: string): Promise<boolean>;
